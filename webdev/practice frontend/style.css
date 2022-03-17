@@ -1,0 +1,62 @@
+/* @keyframes rotate {
+    0%
+    {
+
+    }
+    100%
+    {
+        transform: rotateX(360deg) rotateY(180deg) rotateZ(180deg);
+    }
+}
+.cube
+{
+    position: relative;
+    transform-style: preserve-3d;
+    height: 200px;
+    width: 200px;
+    
+    margin: 200px;
+    transition: 1s ease-in-out;
+    transform: rotateX(25deg) rotateY(125deg);
+    animation: rotate 5s infinite alternate-reverse;
+    perspective: 15000px;
+
+}
+.face
+{
+    height: 100%;
+    width: 100%;
+    border-radius: 0%;
+    position: absolute;
+    transition: ease-in-out 1s;
+
+}
+.f1
+{
+    background-color: orange;
+}
+.f2
+{
+    background-color: red;
+    transform: rotateY(90deg) translateZ(-100px) translateX(-100px);
+}
+.f3
+{
+    background-color: brown;
+    transform: rotateY(-90deg) translateZ(-100px) translateX(100px);
+}
+.f4
+{
+    background-color: blue;
+    transform: rotateX(90deg) translateY(100px) translateZ(100px);
+}
+.f5
+{
+    background-color:green;
+    transform: rotateX(-90deg) translateY(-100px) translateZ(100px);
+}
+.f6
+{
+    background-color: cyan;
+    transform: translateZ(200px);
+} */
