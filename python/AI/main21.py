@@ -1,5 +1,7 @@
 import cv2
 import mediapipe as mp
+import numpy
+import numpy as np
 
 width = 640
 height = 360
@@ -79,11 +81,70 @@ def parseFaceMeshLandmarks(frame):
     return myFacesMesh
 
 
+def findDistances(handData):
+    distMatrix = np.zeros([len(handData), len(handData)], dtype="float")
+    palmSize =  ((handData[0][0] - handData[9][0]) ** 2 + (handData[0][1] - handData[9][1]) ** 2) ** (1. / 2.)
+    for row in range(0, len(handData)):
+        for col in range(0, len(handData)):
+            distMatrix[row][col] = (((handData[row][0] - handData[col][0]) ** 2 + (handData[row][1] - handData[col][1]) ** 2) ** (1. / 2.))/palmSize
+    return distMatrix
+
+
+def findError(gestMatrix, unknownMatrix, keyPoints):
+    error = 0
+    for row in keyPoints:
+        for col in keyPoints:
+            error = error + abs(gestMatrix[row][col] - unknownMatrix[row][col])
+    return error
+
+
+def findGesture(unknownGesture, knownGesture, keyPoints, gestName, tol):
+    errorArray = []
+    for i in range(0, len(gestName)):
+        error = findError(knownGesture[i], unknownGesture, keyPoints)
+        errorArray.append(error)
+    errorMin = errorArray[0]
+    minIndex = 0
+    for i in range(0, len(errorArray)):
+        if errorArray[i] <= errorMin:
+            errorMin = errorArray[i]
+            minIndex = i
+    if errorMin < tol:
+        gesture = gestName[minIndex]
+    else:
+        gesture = "unknown"
+    return gesture
+
+
+keyPoints = [0, 4, 5, 9, 13, 17, 8, 12, 16, 20]
+trainCount = 1
+knownGestures = []
+tol = 10
+gestName = []
+for i in range(trainCount):
+    name = input()
+    gestName.append(name)
+print(gestName)
+
 while True:
     ignore, frame = cam.read()
     frame = cv2.flip(frame, 1)
 
-    myFaceMesh = parseFaceMeshLandmarks(frame)
+    myhand = parseHandLandmarks(frame)
+    if len(myhand) != 0:
+        if trainCount != 0:
+
+        print("show your gesture "+str(trainCount)+" press t when ready")
+        if cv2.waitKey(1) & 0xff == ord('t'):
+            knownGesture = findDistances(myhand[0][0])
+            knownGestures.append(knownGesture)
+            trainCount -= 1
+    if trainCount == 0:
+        if len(myhand) != 0:
+            unknownGesture = findDistances(myhand[0][0])
+            myGesture = findGesture(unknownGesture, knownGestures, keyPoints,gestName,tol)
+            print(myGesture)
+
     cv2.imshow("my webcam", frame)
     cv2.moveWindow("my webcam", 0, 0)
     if cv2.waitKey(1) & 0xff == ord("q"):
